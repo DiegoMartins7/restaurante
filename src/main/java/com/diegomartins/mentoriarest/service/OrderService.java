@@ -22,8 +22,7 @@ public class OrderService {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setOrderItens(orderDto.orderItens());
-
-        calcTotalPrice(order);
+        order.setTotalPrice(orderDto.totalPrice());
 
         return orderRepository.save(order);
     }
@@ -45,19 +44,20 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
         order.setOrderItens(orderDto.orderItens());
 
-        calcTotalPrice(order);
-
         return orderRepository.save(order);
     }
 
-    private void calcTotalPrice(OrderItem order) {
-        double total = order.getOrderItens().stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+    private void calcTotalPrice(Order order) {
+        double total = 0.0;
 
-        if (order.getDiscount() != null && order.getDiscount() > 0) {
-            total -= total * (order.getDiscount() / 100);
+        for (OrderItem item : order.getOrderItens()) {
+            double itemTotal = item.getPrice() * item.getQuantity();
+            if (item.getDiscount() != null && item.getDiscount() > 0) {
+                itemTotal -= itemTotal * (item.getDiscount() / 100.0);
+            }
+            total += itemTotal;
         }
 
         order.setTotalPrice(total);
-
     }
 }

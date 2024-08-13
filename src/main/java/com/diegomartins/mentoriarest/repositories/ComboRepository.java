@@ -10,6 +10,8 @@ import java.util.UUID;
 @Repository
 public interface ComboRepository extends JpaRepository<Combo, UUID> {
 
-    List<Combo> findByComboContainingIgnoreCase(String combo);
+    List<Combo> findByNameContainingIgnoreCase(String combo);
+
+    List<Combo> findByDescriptionContainingIgnoreCase(String description);
 
 }
